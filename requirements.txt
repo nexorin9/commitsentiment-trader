@@ -1,0 +1,8 @@
+requests
+vadersentiment
+pandas
+matplotlib
+alpaca-py
+flask
+aiohttp
+faker

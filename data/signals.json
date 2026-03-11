@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-03-10T00:35:34.139590",
+  "signals": [
+    {
+      "timestamp": "2026-03-06T10:00:00",
+      "signal": "SELL",
+      "sentiment_score": -0.5,
+      "reason": "High negative sentiment (-0.500)"
+    }
+  ],
+  "total_signals": 1,
+  "buy_signals": 0,
+  "sell_signals": 1
+}

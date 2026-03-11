@@ -1,0 +1,48 @@
+{
+  "repos": [
+    {
+      "owner": "tensorflow",
+      "repo": "tensorflow",
+      "days": 30,
+      "max_commits": null
+    },
+    {
+      "owner": "nodejs",
+      "repo": "node",
+      "days": 30,
+      "max_commits": null
+    },
+    {
+      "owner": "golang",
+      "repo": "go",
+      "days": 30,
+      "max_commits": null
+    }
+  ],
+  "symbols": [
+    {
+      "symbol": "AAPL",
+      "initial_capital": 10000.0
+    },
+    {
+      "symbol": "MSFT",
+      "initial_capital": 10000.0
+    }
+  ],
+  "thresholds": {
+    "sentiment_threshold": 0.3,
+    "min_hold_hours": 24
+  },
+  "windows": {
+    "window_hours": 24,
+    "trend_window_hours": 48
+  },
+  "paths": {
+    "data_dir": "data",
+    "results_dir": "results",
+    "logs_dir": "logs",
+    "templates_dir": "templates"
+  },
+  "max_commits": 100,
+  "cache_commits": true
+}

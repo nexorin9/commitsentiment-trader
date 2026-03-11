@@ -1,0 +1,17 @@
+{
+  "passed": [
+    "GitHub Fetcher - Mock data created successfully",
+    "Sentiment Analyzer - All tests passed",
+    "Time Series Engine - All tests passed",
+    "Signal Generator - All tests passed",
+    "Backtester - All tests passed",
+    "Data Pipeline - Structure verified",
+    "Configuration System - All tests passed",
+    "Alpaca Connector - Mock tests passed"
+  ],
+  "failed": [],
+  "warnings": [],
+  "start_time": "2026-03-11T01:20:41.415696",
+  "end_time": "2026-03-11T01:20:41.879564",
+  "all_passed": true
+}

@@ -1,0 +1,10 @@
+2026-03-11 00:57:02 - CommitSentimentTrader - ERROR - logger.py:92 - Test error message
+2026-03-11 00:57:02 - CommitSentimentTrader - ERROR - logger.py:102 - Exception occurred: Test exception
+Traceback (most recent call last):
+  File "<string>", line 12, in <module>
+ValueError: Test exception
+2026-03-11 01:15:24 - CommitSentimentTrader - ERROR - logger.py:92 - Failed to initialize Alpaca clients: You must supply a method of authentication
+2026-03-11 01:15:55 - CommitSentimentTrader - ERROR - logger.py:92 - Failed to initialize Alpaca clients: You must supply a method of authentication
+2026-03-11 01:17:26 - CommitSentimentTrader - ERROR - logger.py:92 - Failed to initialize Alpaca clients: You must supply a method of authentication
+2026-03-11 01:18:31 - CommitSentimentTrader - ERROR - logger.py:92 - Failed to initialize Alpaca clients: You must supply a method of authentication
+2026-03-11 01:20:41 - CommitSentimentTrader - ERROR - logger.py:92 - Failed to initialize Alpaca clients: You must supply a method of authentication

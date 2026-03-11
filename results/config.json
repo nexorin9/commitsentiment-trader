@@ -1,0 +1,18 @@
+{
+  "repos": [
+    {
+      "owner": "test",
+      "repo": "repo"
+    }
+  ],
+  "symbols": [
+    "AAPL",
+    "GOOGL"
+  ],
+  "thresholds": {
+    "positive": 0.3,
+    "negative": -0.3
+  },
+  "time_window": 24,
+  "max_commits": 100
+}

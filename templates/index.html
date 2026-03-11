@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommitSentiment Trader</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #eee;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #4ecca3, #39a2dd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .quote {
+            font-style: italic;
+            opacity: 0.8;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .stat-card h3 {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .stat-card .value {
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        .stat-card .value.positive { color: #4ecca3; }
+        .stat-card .value.negative { color: #e94560; }
+        .chart-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            backdrop-filter: blur(10px);
+        }
+        .chart-title {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+            color: #aaa;
+        }
+        canvas {
+            max-height: 300px;
+        }
+        .signal-card {
+            background: linear-gradient(45deg, #4ecca3, #39a2dd);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .signal-card h3 {
+            font-size: 1em;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 10px;
+        }
+        .signal-card .signal-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: white;
+        }
+        .signal-card .signal-reason {
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+        .btn {
+            background: #4ecca3;
+            color: #1a1a2e;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        .spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #4ecca3;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            color: #e94560;
+            text-align: center;
+            padding: 20px;
+            background: rgba(233, 69, 96, 0.1);
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>CommitSentiment Trader</h1>
+            <p class="quote">Mapping GitHub commit sentiment to trading signals</p>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Repository</h3>
+                <div class="value" id="repo-display">{{ default_repo }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Stock Symbol</h3>
+                <div class="value" id="symbol-display">{{ default_symbol }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Last Updated</h3>
+                <div class="value" id="timestamp">-</div>
+            </div>
+        </div>
+
+        <div class="signal-card">
+            <h3>Latest Trading Signal</h3>
+            <div class="signal-value" id="latest-signal">LOADING...</div>
+            <div class="signal-reason" id="signal-reason">-</div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-title">Sentiment Time Series</div>
+            <canvas id="sentimentChart"></canvas>
+        </div>
+
+        <div style="text-align: center;">
+            <button class="btn" id="analyze-btn" onclick="runAnalysis()">Run Analysis</button>
+            <p style="margin-top: 20px; opacity: 0.6;">Click to refresh data</p>
+        </div>
+
+        <div id="error-message" class="error" style="display: none;"></div>
+    </div>
+
+    <script>
+        let sentimentChart = null;
+
+        async function runAnalysis() {
+            const btn = document.getElementById('analyze-btn');
+            btn.disabled = true;
+            btn.textContent = 'Analyzing...';
+
+            try {
+                const response = await fetch('/api/analyze');
+                const data = await response.json();
+
+                document.getElementById('timestamp').textContent = new Date().toLocaleTimeString();
+
+                if (data.error) {
+                    showError(data.error);
+                    return;
+                }
+
+                // Update signal display
+                if (data.latest_signal) {
+                    const signal = data.latest_signal.signal;
+                    const sentiment = parseFloat(data.latest_signal.sentiment_score).toFixed(3);
+                    const reason = data.latest_signal.reason;
+
+                    const signalEl = document.getElementById('latest-signal');
+                    signalEl.textContent = signal;
+
+                    if (signal === 'BUY') {
+                        signalEl.className = 'signal-value positive';
+                    } else if (signal === 'SELL') {
+                        signalEl.className = 'signal-value negative';
+                    } else {
+                        signalEl.className = 'signal-value';
+                    }
+
+                    document.getElementById('signal-reason').textContent = reason;
+                } else {
+                    document.getElementById('latest-signal').textContent = 'NO SIGNALS';
+                    document.getElementById('signal-reason').textContent = '-';;
+                    document.getElementById('latest-signal').className = 'signal-value';
+                }
+
+                // Update chart
+                updateChart(data.time_series);
+
+                // Update stats
+                if (data.sentiment_analysis) {
+                    const avg = parseFloat(data.sentiment_analysis.avg_sentiment).toFixed(3);
+                    document.querySelector('.stats-grid .stat-card:nth-child(3) .value').textContent = avg;
+                }
+
+            } catch (error) {
+                showError('Error: ' + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Run Analysis';
+            }
+        }
+
+        function updateChart(timeSeries) {
+            const timestamps = timeSeries.timestamps || [];
+            const sentiments = timeSeries.sentiments || [];
+
+            const ctx = document.getElementById('sentimentChart').getContext('2d');
+
+            if (sentimentChart) {
+                sentimentChart.destroy();
+            }
+
+            sentimentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: timestamps.slice(-20),
+                    datasets: [{
+                        label: 'Sentiment Score',
+                        data: sentiments.slice(-20),
+                        borderColor: '#4ecca3',
+                        backgroundColor: 'rgba(78, 204, 163, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 2,
+                        pointHoverRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        title: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#aaa' },
+                            min: -1,
+                            max: 1,
+                            title: { display: true, text: 'Sentiment', color: '#aaa' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#aaa', maxTicksLimit: 6 }
+                        }
+                    }
+                }
+            });
+        }
+
+        function showError(message) {
+            const errorEl = document.getElementById('error-message');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
+            setTimeout(() => {
+                errorEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Run analysis on page load
+        document.addEventListener('DOMContentLoaded', runAnalysis);
+    </script>
+</body>
+</html>

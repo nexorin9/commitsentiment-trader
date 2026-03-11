@@ -1,0 +1,57 @@
+{
+  "test_date": "2026-03-11T01:06:56.534318",
+  "results": [
+    {
+      "name": "sync_fetcher",
+      "duration_seconds": 0.418,
+      "items_processed": 100,
+      "items_per_second": 239.04,
+      "timestamp": "2026-03-11T01:06:56.534318"
+    },
+    {
+      "name": "async_fetcher",
+      "duration_seconds": 0.001,
+      "items_processed": 500,
+      "items_per_second": 500000.0,
+      "timestamp": "2026-03-11T01:06:56.534318"
+    },
+    {
+      "name": "sync_pipeline",
+      "duration_seconds": 0.045,
+      "items_processed": 50,
+      "items_per_second": 1106.18,
+      "timestamp": "2026-03-11T01:06:56.534318"
+    },
+    {
+      "name": "optimized_pipeline",
+      "duration_seconds": 0.013,
+      "items_processed": 50,
+      "items_per_second": 3808.04,
+      "timestamp": "2026-03-11T01:06:56.534318"
+    },
+    {
+      "name": "concurrent_repos",
+      "duration_seconds": 0.187,
+      "items_processed": 5,
+      "items_per_second": 26.8,
+      "timestamp": "2026-03-11T01:06:56.534318"
+    }
+  ],
+  "summary": {
+    "total_tests": 5,
+    "fastest": {
+      "name": "async_fetcher",
+      "duration_seconds": 0.001,
+      "items_processed": 500,
+      "items_per_second": 500000.0,
+      "timestamp": "2026-03-11T01:06:56.534318"
+    },
+    "slowest": {
+      "name": "sync_fetcher",
+      "duration_seconds": 0.418,
+      "items_processed": 100,
+      "items_per_second": 239.04,
+      "timestamp": "2026-03-11T01:06:56.534318"
+    }
+  }
+}
